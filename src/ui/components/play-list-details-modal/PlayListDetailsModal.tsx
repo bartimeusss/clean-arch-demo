@@ -1,30 +1,27 @@
 import React from 'react';
 import ReactModal from 'react-modal';
 
-import { MobXPlayListDetailsState } from 'ui/state/MobXPlayListDetailsState';
-import { ClosePlayListUseCase } from 'application/use-case/ClosePlayListUseCase';
+import { state } from 'ui/state/playListDetailsState';
 
 type PlayListDetailsModalProps = {
-    playListDetailsState: MobXPlayListDetailsState,
-    closePlayListUseCase: ClosePlayListUseCase,
+    closePlayListUseCase: () => Promise<void>,
 };
 
 export const PlayListDetailsModal: React.FC<PlayListDetailsModalProps> = ({
-    playListDetailsState,
     closePlayListUseCase,
 }) => (
     <ReactModal
-        isOpen={playListDetailsState.isModalOpen}
+        isOpen={state.isModalOpen}
         ariaHideApp={false}
-        onRequestClose={closePlayListUseCase.closePlayList}
+        onRequestClose={closePlayListUseCase}
     >
         {
-            playListDetailsState.isLoading && (
+            state.isLoading && (
                 <div>Loading...</div>
             )
         }
         {
-            playListDetailsState.playList?.songs.map(it => (
+            state.playList?.songs.map(it => (
                 <div key={it.id}>
                     <div>{it.name} - {it.artist.name}</div>
                     <div>{it.duration}</div>

@@ -1,0 +1,1 @@
+export const closePlayListUseCase = (closeModal: () => void) => async (): Promise<void> => closeModal();
