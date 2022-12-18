@@ -1,24 +1,19 @@
 import React, { useEffect } from 'react';
 
-import { MobXPlayListsState } from 'ui/state/MobXPlayListsState';
-import { ShowAllPlayListsUseCase } from 'application/use-case/ShowAllPlayListsUseCase';
 import { PlayListPreview } from 'ui/components/play-list-preview';
 import { PlayListDetailsModal } from 'ui/components/play-list-details-modal';
+import { state } from 'ui/state/playListsState';
 
 type PlayListsProps = {
-    playListsState: MobXPlayListsState,
-    showPlayListsUseCase: ShowAllPlayListsUseCase,
+    showPlayListsUseCase: () => Promise<void>,
 };
 
 export const PlayLists: React.FC<PlayListsProps> = ({
-    playListsState,
     showPlayListsUseCase,
 }) => {
-    useEffect(() => {
-        showPlayListsUseCase.showAllPlayLists()
-    }, [showPlayListsUseCase]);
+    useEffect(() => { showPlayListsUseCase(); }, [showPlayListsUseCase]);
 
-    if (playListsState.isLoading) {
+    if (state.isLoading) {
         return (
             <div>Loading...</div>
         );
@@ -27,7 +22,7 @@ export const PlayLists: React.FC<PlayListsProps> = ({
     return (
         <div>
             {
-                playListsState.playLists.map(it => (
+                state.playLists.map(it => (
                     <PlayListPreview key={it.id} playListPreview={it} />
                 ))
             }

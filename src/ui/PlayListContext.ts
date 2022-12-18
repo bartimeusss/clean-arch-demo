@@ -1,13 +1,9 @@
-import { MobXPlayListsState } from 'ui/state/MobXPlayListsState';
-import { MobXPlayListDetailsState } from 'ui/state/MobXPlayListDetailsState';
-import { ShowAllPlayListsUseCase } from 'application/use-case/ShowAllPlayListsUseCase';
-import { OpenPlayListUseCase } from 'application/use-case/OpenPlayListUseCase';
-import { ClosePlayListUseCase } from 'application/use-case/ClosePlayListUseCase';
+import { showAllPlayListsUseCase } from 'application/use-case/showAllPlayListsUseCase';
+import { openPlayListUseCase } from 'application/use-case/openPlayListUseCase';
+import { closePlayListUseCase } from 'application/use-case/closePlayListUseCase';
 
 export type PlayListContext = {
-    playListsState: MobXPlayListsState;
-    playListDetailsState: MobXPlayListDetailsState;
-    showPlayListsUseCase: ShowAllPlayListsUseCase;
-    openPlayListUseCase: OpenPlayListUseCase;
-    closePlayListUseCase: ClosePlayListUseCase;
+    showPlayListsUseCase: ReturnType<typeof showAllPlayListsUseCase>;
+    openPlayListUseCase: ReturnType<typeof openPlayListUseCase>;
+    closePlayListUseCase: ReturnType<typeof closePlayListUseCase>;
 };

@@ -1,4 +1,4 @@
-import { RestClient } from 'repository/RestClient';
+import { restGet } from 'repository/restTypes';
 import { PlayList } from 'application/model/PlayList';
 import { Song } from 'application/model/Song';
 import { Artist } from 'application/model/Artist';
@@ -64,42 +64,36 @@ const artists: Artist[] = [
     },
 ];
 
-export class MockRestClient implements RestClient {
-    async get<Response>(url: string, queryParams: Record<string, any>): Promise<Response> {
-        await this.delay();
+export const mockRestGet: restGet = async <Response>(url: string, queryParams?: Record<string, any>): Promise<Response> => {
+    await delay();
 
-        if (this.shouldThrowError()) {
-            throw Error('Some API error');
-        }
-
-        switch (url) {
-            case '/playlist':
-                return playLists as Response;
-
-            case '/playlist/pl-1':
-                return playLists[0] as Response;
-
-            case '/playlist/pl-2':
-                return playLists[1] as Response;
-
-            case '/song':
-                return songs.filter(it => queryParams['ids'].includes(it.id)) as Response;
-
-            case '/artist':
-                return artists as Response;
-
-            default:
-                throw Error('Not found');
-        }
+    if (shouldThrowError()) {
+        throw Error('Some API error');
     }
 
-    private delay(): Promise<void> {
-        return new Promise(resolve => {
-            setTimeout(() => resolve(), 200);
-        });
-    }
+    switch (url) {
+        case '/playlist':
+            return playLists as Response;
 
-    private shouldThrowError(): boolean {
-        return Math.random() < 0.1;
+        case '/playlist/pl-1':
+            return playLists[0] as Response;
+
+        case '/playlist/pl-2':
+            return playLists[1] as Response;
+
+        case '/song':
+            return songs.filter(it => queryParams!['ids'].includes(it.id)) as Response;
+
+        case '/artist':
+            return artists as Response;
+
+        default:
+            throw Error('Not found');
     }
 }
+
+const delay = (): Promise<void> => new Promise(resolve => {
+    setTimeout(() => resolve(), 200);
+});
+
+const shouldThrowError = () => Math.random() < 0.1;

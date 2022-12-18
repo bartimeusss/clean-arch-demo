@@ -1,15 +1,13 @@
 import { PlayListContext } from 'ui/PlayListContext';
-import { MobXPlayListsState } from 'ui/state/MobXPlayListsState';
-import { MobXPlayListDetailsState } from 'ui/state/MobXPlayListDetailsState';
-import { MobXPlayListsView } from 'ui/view/MobXPlayListsView';
-import { MobXPlayListDetailsView } from 'ui/view/MobXPlayListDetailsView';
-import { MockRestClient } from 'infrastructure/MockRestClient';
-import { RestRepository } from 'repository/RestRepository';
-import { ShowAllPlayListsUseCase } from 'application/use-case/ShowAllPlayListsUseCase';
-import { AlertNotificationView } from 'ui/view/AlertNotificationView';
-import { ConsoleLogger } from 'infrastructure/ConsoleLogger';
-import { OpenPlayListUseCase } from 'application/use-case/OpenPlayListUseCase';
-import { ClosePlayListUseCase } from 'application/use-case/ClosePlayListUseCase';
+import { mockRestGet } from 'infrastructure/MockRestClient';
+import { logError } from 'infrastructure/ConsoleLogger';
+import { showAllPlayListsUseCase } from 'application/use-case/showAllPlayListsUseCase';
+import * as playListsState from 'ui/state/playListsState';
+import * as playListDetailsState from 'ui/state/playListDetailsState';
+import * as repository from 'repository/repository';
+import { showError } from 'ui/notification/notification';
+import { openPlayListUseCase } from 'application/use-case/openPlayListUseCase';
+import { closePlayListUseCase } from 'application/use-case/closePlayListUseCase';
 
 class PlayListsFactory {
     private context: PlayListContext | null = null;
@@ -19,42 +17,26 @@ class PlayListsFactory {
             return this.context;
         }
 
-        const playListsState = new MobXPlayListsState();
-        const playListDetailsState = new MobXPlayListDetailsState();
-
-        const playListsView = new MobXPlayListsView(playListsState);
-        const playListDetailsView = new MobXPlayListDetailsView(playListDetailsState);
-        const notificationView = new AlertNotificationView();
-
-        const logger = new ConsoleLogger();
-
-        const restClient = new MockRestClient();
-        const restRepository = new RestRepository(restClient);
-
-        const showPlayListsUseCase = new ShowAllPlayListsUseCase(
-            restRepository,
-            playListsView,
-            notificationView,
-            logger,
-        );
-
-        const openPlayListUseCase = new OpenPlayListUseCase(
-            playListDetailsView,
-            restRepository,
-            restRepository,
-            restRepository,
-            notificationView,
-            logger,
-        );
-
-        const closePlayListUseCase = new ClosePlayListUseCase(playListDetailsView);
-
         this.context = {
-            playListsState,
-            playListDetailsState,
-            showPlayListsUseCase,
-            openPlayListUseCase,
-            closePlayListUseCase,
+            showPlayListsUseCase: showAllPlayListsUseCase(
+                playListsState.showLoader,
+                playListsState.hideLoader,
+                repository.getAllPlayLists(mockRestGet),
+                playListsState.showPlayListsAndHideLoader,
+                showError,
+                logError,
+            ),
+            openPlayListUseCase: openPlayListUseCase(
+                playListDetailsState.openModalWithLoader,
+                repository.getPlayList(mockRestGet),
+                repository.getSongs(mockRestGet),
+                repository.getArtists(mockRestGet),
+                playListDetailsState.showPlayListAndHideLoader,
+                playListDetailsState.closeModalAndHideLoader,
+                showError,
+                logError,
+            ),
+            closePlayListUseCase: closePlayListUseCase(playListDetailsState.closeModal),
         };
 
         return this.context;
